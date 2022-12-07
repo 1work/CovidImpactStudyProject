@@ -16,6 +16,8 @@ let selectedTimeRange = [];
 // load data using promises
 let promisess = [
 
+    //d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),  // not projected -> you need to do it
+    // already projected -> you can just scale it to fit your browser window
 
     d3.csv("project_data/final_gdp_percapita.csv"),
     d3.csv("project_data/vaccineFinal.csv"),
@@ -50,6 +52,7 @@ function initMainPage(dataArray) {
     // console.log("who", dataArray[3])
     myLineVis = new lineVis('lineDiv', dataArray[0], dataArray[1])
     myGlobeVis = new GlobeVis("globeDiv", dataArray[9], dataArray[10])
+    console.log("this is the state latituted", dataArray[7])
     MyMapVis = new MapVis("mapDiv", dataArray[3],dataArray[4], dataArray[5], dataArray[7])
     myBoxVis = new boxVis('boxDiv', dataArray[1]);
     myBrushVis = new BrushVis('brushDiv', dataArray[6]);

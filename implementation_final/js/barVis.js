@@ -16,7 +16,8 @@ class barVis {
         let vis = this;
         vis.margin = {top: 20, right: 20, bottom: 20, left: 40};
         vis.width = document.getElementById(vis.parentElement).getBoundingClientRect().width - vis.margin.left - vis.margin.right;
-        vis.height = 450 - vis.margin.top - vis.margin.bottom;
+        vis.height = 400 - vis.margin.top - vis.margin.bottom;
+        console.log('post 1');
 
         // init drawing area
         vis.svg = d3.select("#" + vis.parentElement).append("svg")
@@ -47,6 +48,7 @@ class barVis {
         vis.XAxisGroup = vis.svg.append("g")
             .attr("class", "x-axis, axis")
             .attr("transform", "translate(-7," + vis.height + ")");
+        console.log('end init');
         vis.wrangleData()
 
     }
@@ -62,6 +64,7 @@ class barVis {
             row.Rural = +row.Rural
             row.Urban = +row.Urban
         })
+        console.log('Upload');
 
         vis.updateVis()
 
@@ -74,11 +77,10 @@ class barVis {
         // let selection = d3.select("#ranking-type").property("value");
         let selection = 'Male';
 
-        vis.barData = vis.attendanceData.sort((a,b)=> b[selection] - a[selection]);
-        vis.barD = vis.barData.slice(0, 20)
+        vis.attendanceData.sort((a,b)=> b[selection] - a[selection]);
         //console.log("this is the attendance data ", vis.attendanceData)
-        vis.x.domain(vis.barD.map(d=> d.Country));
-        vis.y.domain([0, d3.max(vis.barD, d=> d[selection])]);
+        vis.x.domain(vis.attendanceData.map(d=> d.Country));
+        vis.y.domain([0, d3.max(vis.attendanceData, d=> d[selection])]);
 
         // update axis
         vis.xAxis.scale(vis.x);
@@ -87,24 +89,25 @@ class barVis {
             .attr('transform', `translate (10, -10)`);
         vis.XAxisGroup.call(vis.xAxis)
             .attr('font-size', 'xx-small')
-            .attr('transform', `translate (${vis.margin.left-30}, ${vis.margin.top+ 330})`)
+            .attr('transform', `translate (${vis.margin.left-30}, ${vis.margin.top+ 200})`)
             .selectAll("text")
             .attr("transform", "rotate(-10)");
 
 
         // console.log(vis.attendanceData);
 
-        vis.bars = vis.svg.selectAll("rect")
-            .data(vis.barD);
+        let rectangle = vis.svg.selectAll("rect")
+            .data(vis.attendanceData);
 
-        vis.bars.enter().append("rect")
-            .attr("class", "bars")
-            .merge(vis.bars)
+
+        rectangle.enter().append("rect")
+            .attr("class", "bar")
+            .merge(rectangle)
+            .transition()
             .attr("x", d=> vis.x(d.Country))
             .attr("y", d=> vis.y(d[selection]))
-            .style("fill", "blue")
-            .attr("height", d=> {
-                return vis.height - vis.y(d[selection])});
+            // .attr("width", vis.x.bandwidth())
+            .attr("height", d=> vis.height - vis.y(d[selection]));
 
         vis.svg.select(".y-axis")
             .transition()
@@ -114,7 +117,7 @@ class barVis {
             .transition()
             .call(vis.xAxis);
 
-        // rectangle.exit().remove();
+        rectangle.exit().remove();
 
         //d3.select("#ranking-type").on("change", updateVisualization);
 
